@@ -13,8 +13,12 @@ def knn(x, k):
     return max(neighbours, key=neighbours.get)
 
 
-
+# %%
 def distance(a, b):
-    # TODO implement eucledian distance
-    pass
-
+    distance_sq = 0
+    i = 0
+    while i < len(a):
+        distance_sq += (a[i] - b[i])**2
+        i += 1
+    return math.sqrt(distance_sq)
+# %%
