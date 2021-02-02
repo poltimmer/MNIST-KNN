@@ -3,12 +3,11 @@ import math
 
 
 # %% 
-def knn(x, k):
+def knn_iter(x, k):
     neighbours = {}
     for i in range(k):
-        # closests = #min of distance
         closest = None
-        neighbours[closest] = neighbours.get(closest, 0) + 1
+        neighbours[closest] = neighbours.get(closest, 0) + 1 #TODO this should be class of neighbour, not neighbour itself. 
 
     return max(neighbours, key=neighbours.get)
 
