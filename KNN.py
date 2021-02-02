@@ -2,12 +2,14 @@
 import math
 
 
+#TODO define datapoints as tuples with (point in space, class)
+
 # %% 
 def knn_iter(x, k):
     neighbours = {}
     for i in range(k):
-        closest = None
-        neighbours[closest] = neighbours.get(closest, 0) + 1 #TODO this should be class of neighbour, not neighbour itself. 
+        ith_closest = None
+        neighbours[ith_closest[1]] = neighbours.get(ith_closest[1], 0) + 1 
 
     return max(neighbours, key=neighbours.get)
 
