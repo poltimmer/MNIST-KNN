@@ -22,4 +22,4 @@ class KNN:
             # take the label that appears most often or in case of a tie take one of these most frequent ones at random
             y = smallest.mode().sample()
             y_pred.append(y.values[0])
-        return pd.DataFrame(y_pred)
+        return pd.Series(y_pred)
