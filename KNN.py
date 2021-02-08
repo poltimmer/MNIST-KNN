@@ -1,8 +1,15 @@
 # %%
 import math
+import pandas as pd
 
 
-#TODO define datapoints as tuples with (point in space, class)
+train = pd.read_csv("input/MNIST_train_small.csv", header=None)
+y_train = train[0]
+x_train = train.drop(columns=0)
+
+test = pd.read_csv("input/MNIST_test_small.csv", header=None)
+y_test = test[0]
+x_test = test.drop(columns=0)
 
 # %% 
 def knn_iter(x, k):
