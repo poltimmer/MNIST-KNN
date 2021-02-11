@@ -6,7 +6,7 @@ def acc_score(y_test, y_pred):
 
 def leave_one_out(X, y, k):
     out = []
-    for ix, row in X.iterrows():
+    for ix in range(len(X)):
         # leave one out of X and y, this becomes training
         X_t, y_t = X.drop(index=ix), y.drop(index=ix)
         # the one left out is used to validate
@@ -17,9 +17,9 @@ def leave_one_out(X, y, k):
         val = model.predict(X_v).values[0]
         out.append(
             {
-                "index":ix,
-                'predicted': val,
-                'true': y_v.values[0],
+                # "index":ix,
+                # 'predicted': val,
+                # 'true': y_v.values[0],
                 'correct': (y_v.values[0]==val)*1
             }
         )
