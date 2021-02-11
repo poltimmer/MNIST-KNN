@@ -1,15 +1,6 @@
-#%%
+# %% 
 import pandas as pd
 from KNN import KNN
-
-# simple accuracy score
-def acc_score(y_test, y_pred):
-    return (y_test == y_pred).mean()
-
-def leave_one_out(x, y):
-    for ix, row in x.iterrows():
-        
-
 # %%
 # load training data
 train = pd.read_csv("input/MNIST_train_small.csv", header=None)
@@ -21,6 +12,7 @@ test = pd.read_csv("input/MNIST_test_small.csv", header=None)
 y_test = test[0]
 x_test = test.drop(columns=0)
 
+# %%
 # perform predictions
 model = KNN(x_train, y_train, 5)
 y_train_pred = KNN.predict(x_train)
