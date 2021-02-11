@@ -1,4 +1,4 @@
-# %%
+#%%
 import pandas as pd
 from KNN import KNN
 
@@ -32,4 +32,16 @@ y_test_pred.to_csv("output/pred_small.csv", header=False)
 train_accuracy = acc_score(y_train_pred, y_train)
 test_accuracy = acc_score(y_test_pred, y_test)
 
-# %%
+
+#%%
+# simple 0/1 loss function
+loss = 0
+for i, yi in y_test.iteritems():
+    if yi != y_pred[0][i]:
+        loss += 1
+print("Loss: " + str(loss))
+
+#%%
+# empirical risk
+emp_risk = loss/len(y_pred)
+print("Empirical risk: " + str(emp_risk))
