@@ -1,6 +1,7 @@
 # %% 
 import pandas as pd
 from KNN import KNN
+import numpy as np
 from func import acc_score, leave_one_out
 from matplotlib import pyplot as plt
 # %%
@@ -75,6 +76,24 @@ ax.legend()
 ax.set_xticks(range(1,21))
 ax.set_ylabel("empirical risk")
 ax.set_xlabel("k")
+ax.grid()
+plt.show()
+
+# %%
+Xs, ys = x_train[:500], y_train[:500] #smaller sets to test soluton
+k_range = np.linspace(1,20,20, dtype=int)
+result = [{'risk':1-leave_one_out(Xs, ys, k), 'k':k} for k in k_range]
+
+# %% 
+line = [r.get('risk') for r in result]
+fig = plt.figure(figsize=(5,5))
+ax = fig.add_subplot()
+ax.plot(range(1, 21), line, label="leave-one-out", marker=".")
+ax.legend()
+ax.set_xticks(range(1,21))
+ax.set_ylabel("empirical risk")
+ax.set_xlabel("k")
+ax.set_ylim(bottom=0, top=0.35)
 ax.grid()
 plt.show()
 # %%
