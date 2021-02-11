@@ -1,6 +1,7 @@
 # %% 
 import pandas as pd
 from KNN import KNN
+from func import acc_score, leave_one_out
 # %%
 # load training data
 train = pd.read_csv("input/MNIST_train_small.csv", header=None)
