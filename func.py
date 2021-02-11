@@ -12,7 +12,7 @@ def leave_one_out(X, y, k):
         # the one left out is used to validate
         X_v, y_v = X.iloc[[ix]], y.iloc[[ix]]
         # create model
-        model = KNN(X_t, y_t, 5)
+        model = KNN(X_t, y_t, k)
         #predict the value using the validation row
         val = model.predict(X_v).values[0]
         out.append(
