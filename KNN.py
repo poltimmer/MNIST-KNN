@@ -1,13 +1,27 @@
 import pandas as pd
 import numpy as np
 from scipy.spatial.distance import cdist
+from scipy.spatial import KDTree
+from sklearn.neighbors import BallTree
 
 
 class KNN:
-    def __init__(self, x_train, y_train, k):
+    def __init__(self, x_train, y_train, k, kd_tree=False, ball_tree=False):
         self.x_train = x_train
         self.y_train = y_train
         self.k = k
+        self.kd_tree = KDTree(x_train) if kd_tree else None
+        self.ball_tree = BallTree(x_train) if ball_tree else None
+
+    def predictBallTree(self, x_test):
+        _, indices = self.ball_tree.query(x_test, k=self.k)
+        y_pred = [self.y_train.iloc[nearest].mode().sample().values[0] for nearest in indices]
+        return pd.DataFrame(y_pred)
+
+    def predictKDTree(self, x_test):
+        _, indices = self.kd_tree.query(x_test, k=self.k)
+        y_pred = [self.y_train.iloc[nearest].mode().sample().values[0] for nearest in indices]
+        return pd.DataFrame(y_pred)
 
     def predict(self, x_test):
         y_pred = []
