@@ -6,7 +6,9 @@ from KNN import KNN
 def acc_score(y_test, y_pred):
     return (y_test == y_pred).mean()
 
-
+def leave_one_out(x, y):
+    for ix, row in x.iterrows():
+        
 
 # %%
 # load training data

@@ -20,6 +20,6 @@ class KNN:
             # take the label of the smallest indexes of these k closest points
             smallest = self.y_train.iloc[ismallest]
             # take the label that appears most often or in case of a tie take one of these most frequent ones at random
-            y = smallest.mode().sample()
+            y = smallest.mode().sample(random_state=123)
             y_pred.append(y.values[0])
         return pd.Series(y_pred)
