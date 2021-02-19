@@ -37,3 +37,5 @@ class KNN:
             y = smallest.mode().sample(random_state=123)
             y_pred.append(y.values[0])
         return pd.Series(y_pred)
+
+
