@@ -1,7 +1,9 @@
+#%%
 from tqdm import tqdm
 import pandas as pd
 import matplotlib.pyplot as plt
 from KNN import *
+from sklearn.preprocessing import MinMaxScaler
 
 # load training data
 train = pd.read_csv("input/MNIST_train_small.csv", header=None)
@@ -30,9 +32,26 @@ for metric in tqdm(['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correla
     distance_results_small.append([metric, accuracy])
 
 #%%
+#Normalize data
+Xs_tr_norm = pd.DataFrame(MinMaxScaler().fit_transform(Xs_tr)) #immediately convert back to df
+Xs_te_norm = pd.DataFrame(MinMaxScaler().fit_transform(Xs_te))
+
+#%%
+distance_results_small_scaled = []
+
+for metric in tqdm(['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'matching', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']):
+    clf = KNN(Xs_tr_norm, ys_tr, 5)
+    y_pred = clf.predict(Xs_te_norm, metric)
+    accuracy = acc_score(ys_te, y_pred)
+    distance_results_small_scaled.append([metric, accuracy])
+
+#%%
 # plot distance metric vs loss
-plt.bar(*zip(*distance_results_small))
+plt.bar(*zip(*distance_results_small), label='Unprocessed')
+plt.bar(*zip(*distance_results_small_scaled), label='Normalized')
 plt.xlabel("Metric")
 plt.xticks(rotation=90)
-plt.ylabel("Loss")
+plt.ylabel("Accuracy")
+plt.legend(loc='best')
 plt.show()
+# %%
