@@ -4,6 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from KNN import *
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
+import time
+
 
 # load training data
 train = pd.read_csv("input/MNIST_train_small.csv", header=None)
@@ -54,4 +57,50 @@ plt.xticks(rotation=90)
 plt.ylabel("Accuracy")
 plt.legend(loc='best')
 plt.show()
+# %%
+
+
+
+
+# %%
+#######
+#### PCA
+#######
+
+# Find significance in speedup:
+pca = PCA(n_components=25)
+x_train_tr = pd.DataFrame(pca.fit(x_train).transform(x_train))
+x_test_tr = pd.DataFrame(pca.transform(x_test))
+model_1 = KNN(x_train, y_train, 5)
+model_2 = KNN(x_train_tr, y_train, 5)
+
+#Speed comparison:
+now = time.time()
+score = acc_score(model_2.predict(x_test_tr), y_test)
+print('time PCA set, score:',time.time() - now, score)
+now = time.time()
+score = acc_score(model_1.predict(x_test), y_test)
+print('time full set, score:',time.time() - now, score)
+
+
+# Find best number of components:
+
+# %%
+def get_score(components):
+    pca = PCA(n_components=components)
+    x_train_tr = pd.DataFrame(pca.fit(x_train).transform(x_train))
+    x_test_tr = pd.DataFrame(pca.transform(x_test))
+    score = acc_score(KNN(x_train_tr, y_train, 5).predict(x_test_tr), y_test)
+    return score
+
+component_range = np.append(np.linspace(5, 25, 20, dtype=int),np.linspace(50,100,3, dtype=int))
+comp_scores = {comp: get_score(comp) for comp in component_range}
+
+# %%
+plt.plot(comp_scores.keys(), comp_scores.values(), linewidth=1, marker='.')
+plt.grid()
+plt.text(25, 0.91, 'Score at n=25: ' + str(comp_scores.get(25)))
+plt.ylabel("Accuracy")
+plt.xlabel("N components in PCA")
+plt.title('Comparing accuraccy scores of KNN using PCA with N components')
 # %%

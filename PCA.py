@@ -46,8 +46,9 @@ def get_score(components):
     score = acc_score(KNN(x_train_tr, y_train, 5).predict(x_test_tr), y_test)
     return score
 
-scores = [{comp: get_score(comp)} for comp in np.linspace(25,250,10, dtype=int)]
-scores2 = [{comp: get_score(comp)} for comp in np.linspace(1, 25, 25, dtype=int)]
+component_range = np.concat(np.linspace(1, 25, 25, dtype=int),np.linspace(25,250,10, dtype=int))
+
+comp_scores = [{comp: get_score(comp)} for comp in component_range]
 
 
 # %%
