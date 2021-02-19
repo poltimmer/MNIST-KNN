@@ -23,12 +23,12 @@ class KNN:
         y_pred = [self.y_train.iloc[nearest].mode().sample().values[0] for nearest in indices]
         return pd.DataFrame(y_pred)
 
-    def predict(self, x_test):
+    def predict(self, x_test, metric):
         y_pred = []
         # iterate through every test entry to be predicted
         for _, xi in x_test.iterrows():
             # calculate the euclidean distance between each row in x_train and xi
-            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric='euclidean')
+            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)
             # partition the array such that the smallest k elements are in [:self.k]
             ismallest = np.argpartition(dist_mat, self.k, axis=None)[:self.k]
             # take the label of the smallest indexes of these k closest points
@@ -37,3 +37,5 @@ class KNN:
             y = smallest.mode().sample(random_state=123)
             y_pred.append(y.values[0])
         return pd.Series(y_pred)
+
+
