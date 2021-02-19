@@ -5,6 +5,7 @@ import pandas as pd
 from func import acc_score
 from KNN import KNN
 import time
+import numpy as np
 
 # load training data
 train = pd.read_csv("input/MNIST_train_small.csv", header=None)
@@ -38,7 +39,7 @@ print('time:',time.time() - now, score)
 
 ## testing N components
 # %%
-def get_score(components): 
+def get_score(components):
     pca = PCA(n_components=components)
     x_train_tr = pd.DataFrame(pca.fit(x_train).transform(x_train))
     x_test_tr = pd.DataFrame(pca.transform(x_test))
@@ -47,6 +48,6 @@ def get_score(components):
 
 scores = [{comp: get_score(comp)} for comp in np.linspace(25,250,10, dtype=int)]
 scores2 = [{comp: get_score(comp)} for comp in np.linspace(1, 25, 25, dtype=int)]
-    
+
 
 # %%
