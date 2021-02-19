@@ -28,14 +28,21 @@ class KNN:
         # iterate through every test entry to be predicted
         for _, xi in x_test.iterrows():
             # calculate the euclidean distance between each row in x_train and xi
-            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)
+            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)[0]
             # partition the array such that the smallest k elements are in [:self.k]
-            ismallest = np.argpartition(dist_mat, self.k, axis=None)[:self.k]
-            # take the label of the smallest indexes of these k closest points
-            smallest = self.y_train.iloc[ismallest]
-            # take the label that appears most often or in case of a tie take one of these most frequent ones at random
-            y = smallest.mode().sample(random_state=123)
-            y_pred.append(y.values[0])
+            ismallest = np.argpartition(dist_mat, self.k)[:self.k]
+            while True:
+                # take the label of the smallest indexes of these k closest points
+                smallest = self.y_train.iloc[ismallest]
+                # take the labels that appear most often amongst these k closest points
+                y = smallest.mode()
+                # in case there is one, we use this label as the prediction
+                if len(y) == 1:
+                    y_pred.append(y.values[0])
+                    break
+                # else we ignore the point that was furthest away
+                rem = max(ismallest, key=lambda i: dist_mat[i])
+                ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
         return pd.Series(y_pred)
 
 
