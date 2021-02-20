@@ -3,7 +3,8 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.spatial import KDTree
 from sklearn.neighbors import BallTree
-
+from tqdm.contrib.concurrent import process_map, cpu_count
+from functools import partial
 
 class KNN:
     def __init__(self, x_train, y_train, k, kd_tree=False, ball_tree=False):
@@ -44,5 +45,30 @@ class KNN:
                 rem = max(ismallest, key=lambda i: dist_mat[i])
                 ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
         return pd.Series(y_pred)
+
+    def predict_concurrent(self, x_test, metric='euclidean'):
+        predict_single_partial = partial(self.predict_single, metric=metric)
+        y_pred = process_map(predict_single_partial, [xi for _, xi in x_test.iterrows()], max_workers=cpu_count()-2, chunksize=max(50, int(x_train.shape[0]/200)))
+        # iterate through every test entry to be predicted
+
+        return pd.Series(y_pred)
+
+    def predict_single(self, xi, metric='euclidean'):
+        # calculate the euclidean distance between each row in x_train and xi
+        dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)[0]
+        # partition the array such that the smallest k elements are in [:self.k]
+        ismallest = np.argpartition(dist_mat, self.k)[:self.k]
+        while True:
+            # take the label of the smallest indexes of these k closest points
+            smallest = self.y_train.iloc[ismallest]
+            # take the labels that appear most often amongst these k closest points
+            y = smallest.mode()
+            # in case there is one, we use this label as the prediction
+            if len(y) == 1:
+                return y.values[0]
+            # else we ignore the point that was furthest away
+            rem = max(ismallest, key=lambda i: dist_mat[i])
+            ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
+        
 
 
