@@ -2,7 +2,7 @@
 import pandas as pd
 from KNN import KNN
 import numpy as np
-from func import acc_score, leave_one_out
+from crossval import acc_score, leave_one_out
 from matplotlib import pyplot as plt
 # %%
 

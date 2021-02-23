@@ -2,7 +2,7 @@
 #%%
 from sklearn.decomposition import PCA
 import pandas as pd
-from func import acc_score
+from crossval import acc_score
 from KNN import KNN
 import time
 import numpy as np
