@@ -33,8 +33,7 @@ def main():
     preds = []
     for k in range(1, k_upper):
         print('scoring for k =' + str(k))
-        model = KNN(x_train, y_train, k)
-        train_pred = leave_one_out(x_train, y_train, metric='rogerstanimoto')
+        train_pred = leave_one_out(x_train, y_train, metric='rogerstanimoto', k=k)
         preds.append({"train": train_pred})#, "test": test_pred})
 
     train_risk = [1-p.get('train') for p in preds]
