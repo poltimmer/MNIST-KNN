@@ -28,12 +28,12 @@ def leave_one_out_legacy(X, y, k):
     #return out #returns full output
     return sum(o.get('correct') for o in out)/len(out) # returns accuraccy 
 
-def leave_one_out(X, y, k):
-    crossval_partial = partial(leave_one_out_worker, X=X, y=y, k=k)
-    out = process_map(crossval_partial, range(len(X)), max_workers=cpu_count()-2, chunksize=max(50, int(len(X)/100)))
+def leave_one_out(X, y, k, metric='euclidean', p=None):
+    crossval_partial = partial(leave_one_out_worker, X=X, y=y, k=k, metric=metric, p=p)
+    out = process_map(crossval_partial, range(len(X)), max_workers=cpu_count()-2, chunksize=max(50, int(len(X)/(cpu_count()*2))))
     return sum(o.get('correct') for o in out)/len(out) # returns accuraccy 
 
-def leave_one_out_worker(ix, X, y, k):
+def leave_one_out_worker(ix, X, y, k, metric, p=None):
     # leave one out of X and y, this becomes training
     X_t, y_t = X.drop(index=ix), y.drop(index=ix)
     # the one left out is used to validate
@@ -41,7 +41,7 @@ def leave_one_out_worker(ix, X, y, k):
     # create model
     model = KNN(X_t, y_t, k)
     #predict the value using the validation row
-    val = model.predict_single(X_v)
+    val = model.predict_single(X_v, metric=metric, p=p)
     return {
         # "index":ix,
         # 'predicted': val,

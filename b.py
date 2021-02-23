@@ -21,9 +21,9 @@ def main():
     line = [r.get('risk') for r in result]
     fig = plt.figure(figsize=(5,5))
     ax = fig.add_subplot()
-    ax.plot(range(1, 21), line, label="leave-one-out", marker=".")
+    ax.plot(k_range, line, label="leave-one-out", marker=".")
     ax.legend()
-    ax.set_xticks(range(1,21))
+    ax.set_xticks(k_range)
     ax.set_ylabel("empirical risk")
     ax.set_xlabel("k")
     ax.set_ylim(bottom=0, top=0.35)

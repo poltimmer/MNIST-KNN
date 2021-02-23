@@ -53,9 +53,12 @@ class KNN:
 
         return pd.Series(y_pred)
 
-    def predict_single(self, xi, metric='euclidean'):
+    def predict_single(self, xi, metric='euclidean', p=None):
         # calculate the euclidean distance between each row in x_train and xi
-        dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)[0]
+        if p:
+            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric, p=p)[0]
+        else: 
+            dist_mat = cdist(np.expand_dims(xi.to_numpy(), axis=0), self.x_train, metric=metric)[0]
         # partition the array such that the smallest k elements are in [:self.k]
         ismallest = np.argpartition(dist_mat, self.k)[:self.k]
         while True:
