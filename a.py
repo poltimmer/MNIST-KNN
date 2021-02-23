@@ -32,10 +32,9 @@ def main():
     # x_test = x_test[:500]
     # y_test = y_test[:500]
 
-    get_preds_partial = partial(get_preds, x_train=x_train, y_train=y_train, x_test=x_test)
 
     # TWO OPTIONS FOR CONCURRENCY:
-
+    # get_preds_partial = partial(get_preds, x_train=x_train, y_train=y_train, x_test=x_test)
     # Prediction sets parallel (less overhead but doesn't divide as nicely due to lower amount of workers)
     # preds = process_map(get_preds_partial, range(1, k_upper), max_workers=cpu_count()-2)
 
