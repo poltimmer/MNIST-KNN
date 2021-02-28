@@ -13,7 +13,7 @@ def main():
         x_train = train.drop(columns=0)
 
         # train model
-        scores = [{'accuracy':leave_one_out(x_train, y_train, k, metric='minkowski', p=p), 'k':k, 'p':p} for p in range(1, 5) for k in range(1, 5)]
+        scores = [{'accuracy':leave_one_out(x_train, y_train, k, metric='minkowski', p=p), 'k':k, 'p':p} for p in range(1, 16) for k in range(1, 21)]
 
         # print k and p with highest accuracy
         best_score = max(scores, key=lambda x:x['accuracy'])
