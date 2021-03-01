@@ -72,6 +72,27 @@ class KNN:
             # else we ignore the point that was furthest away
             rem = max(ismallest, key=lambda i: dist_mat[i])
             ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
+
+    def leave_one_out(self, i, metric='euclidean', p=None):
+        y_train = self.y_train.drop(index=i)
+        # calculate the euclidean distance between each row in x_train and xi
+        if p:
+            dist_mat = cdist(np.expand_dims(self.x_train.iloc[i].to_numpy(), axis=0), self.x_train.drop(index=i), metric=metric, p=p)[0]
+        else: 
+            dist_mat = cdist(np.expand_dims(self.x_train.iloc[i].to_numpy(), axis=0), self.x_train.drop(index=i), metric=metric)[0]
+        # partition the array such that the smallest k elements are in [:self.k]
+        ismallest = np.argpartition(dist_mat, self.k)[:self.k]
+        while True:
+            # take the label of the smallest indexes of these k closest points
+            smallest = y_train.iloc[ismallest]
+            # take the labels that appear most often amongst these k closest points
+            y = smallest.mode()
+            # in case there is one, we use this label as the prediction
+            if len(y) == 1:
+                return y.values[0]
+            # else we ignore the point that was furthest away
+            rem = max(ismallest, key=lambda i: dist_mat[i])
+            ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
         
 
 

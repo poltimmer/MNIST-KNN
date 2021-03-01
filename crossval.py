@@ -49,3 +49,9 @@ def leave_one_out_worker(ix, X, y, k, metric, p=None):
         'correct': (y_v==val)*1
     }
     #return out #returns full output
+
+def leave_one_out_smart(X, y, k, metric='euclidean', p=None):
+    # Just as slow as leave_one_out(). 
+    model = KNN(X, y, k)
+    out = process_map(partial(model.leave_one_out, metric=metric, p=p), range(len(X)), max_workers=cpu_count()-2, chunksize=max(50, int(len(X)/(cpu_count()*2))))
+    return (out == y).mean() # returns accuraccy 
