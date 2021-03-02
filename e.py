@@ -7,11 +7,16 @@ from matplotlib import pyplot as plt
 from crossval import acc_score, leave_one_out
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
+import pickle
 
+p = 5 #TODO DEZE AANPASSEN
+metric = 'minkowski'
 
+# %%
 def main():
 
-    train = pd.read_csv("input/MNIST_train.csv", header=None)
+
+    train = pd.read_csv("input/MNIST_train_small.csv", header=None)
     y_train = train[0]
     x_train = train.drop(columns=0)
     print('Done loading')
@@ -33,22 +38,25 @@ def main():
     preds = []
     for k in range(1, k_upper):
         print('scoring for k =' + str(k))
-        train_pred = leave_one_out(x_train, y_train, metric='rogerstanimoto', k=k)
+        train_pred = leave_one_out(x_train, y_train, metric=metric, k=k, p=p)
         preds.append({"train": train_pred})#, "test": test_pred})
+
+
+
+    pickle.dump(preds, open("preds_e.pickle", "wb"))
+
 
     train_risk = [1-p.get('train') for p in preds]
 
 
     fig = plt.figure(figsize=(10,6))
-    ax_risk = fig.add_subplot(122)
-    ax_loss = fig.add_subplot(121)
-
-    ax_risk.plot(range(1, k_upper), train_risk, label="train", marker=".")
-    ax_risk.legend()
-    ax_risk.set_xticks(range(1, k_upper))
-    ax_risk.set_ylabel("empirical risk")
-    ax_risk.set_xlabel("k")
-    ax_risk.grid()
+    ax = fig.add_subplot()
+    ax.plot(range(1, k_upper), train_risk, label="train_risk", marker=".")
+    ax.legend()
+    ax.set_xticks(range(1, k_upper))
+    ax.set_ylabel("empirical risk")
+    ax.set_xlabel("k")
+    ax.grid()
 
     plt.show()
 

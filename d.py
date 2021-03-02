@@ -101,6 +101,6 @@ plt.plot(comp_scores.keys(), comp_scores.values(), linewidth=1, marker='.')
 plt.grid()
 plt.text(25, 0.91, 'Score at n=25: ' + str(comp_scores.get(25)))
 plt.ylabel("Accuracy")
-plt.xlabel("N components in PCA")
-plt.title('Comparing accuraccy scores of KNN using PCA with N components')
+plt.xlabel("n components")
+plt.title('Accuracy scores of MNIST small dataset predictions after PCA with n components')
 # %%

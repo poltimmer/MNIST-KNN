@@ -46,8 +46,8 @@ class KNN:
                 ismallest = np.delete(ismallest, np.argwhere(ismallest == rem))
         return pd.Series(y_pred)
 
-    def predict_concurrent(self, x_test, metric='euclidean'):
-        predict_single_partial = partial(self.predict_single, metric=metric)
+    def predict_concurrent(self, x_test, metric='euclidean', p=None):
+        predict_single_partial = partial(self.predict_single, metric=metric, p=p)
         y_pred = process_map(predict_single_partial, [xi for _, xi in x_test.iterrows()], max_workers=cpu_count()-2, chunksize=max(50, int(x_test.shape[0]/100)))
         # iterate through every test entry to be predicted
 
