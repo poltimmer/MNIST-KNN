@@ -16,7 +16,7 @@ metric = 'minkowski'
 def main():
 
 
-    train = pd.read_csv("input/MNIST_train_small.csv", header=None)
+    train = pd.read_csv("input/MNIST_train.csv", header=None)
     y_train = train[0]
     x_train = train.drop(columns=0)
     print('Done loading')
@@ -54,7 +54,7 @@ def main():
     ax.plot(range(1, k_upper), train_risk, label="train_risk", marker=".")
     ax.legend()
     ax.set_xticks(range(1, k_upper))
-    ax.set_ylabel("empirical risk")
+    ax.set_ylabel("empirical risk using LOOCV")
     ax.set_xlabel("k")
     ax.grid()
 
