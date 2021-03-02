@@ -6,7 +6,7 @@ from functools import partial
 def acc_score(y_test, y_pred):
     return (y_test == y_pred).mean()
 
-def leave_one_out_legacy(X, y, k):
+def leave_one_out_legacy(X, y, k, metric='euclidean', p=None):
     out = []
     for ix in range(len(X)):
         # leave one out of X and y, this becomes training
@@ -16,7 +16,7 @@ def leave_one_out_legacy(X, y, k):
         # create model
         model = KNN(X_t, y_t, k)
         #predict the value using the validation row
-        val = model.predict_single(X_v)
+        val = model.predict_single(X_v, metric=metric, p=p)
         out.append(
             {
                 # "index":ix,
