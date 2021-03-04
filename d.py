@@ -19,47 +19,57 @@ y_test = test[0]
 x_test = test.drop(columns=0)
 
 #%%
-Xs_tr, ys_tr = x_train[:500], y_train[:500] #smaller train sets to test soluton
-Xs_te, ys_te = x_test[:500], y_test[:500] #smaller test sets to test soluton
-
-distance_results_small = []
+########################### DISTANCE ON FULL DATASET ###############################
+accuracy_barchart = []
+time_barchart = []
 
 def acc_score(y_test, y_pred):
         return (y_test == y_pred).mean()
 
 # minowski, weighted minowski and mahalanobis left out
-for metric in tqdm(['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'matching', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']):
-    clf = KNN(Xs_tr, ys_tr, 5)
-    y_pred = clf.predict(Xs_te, metric)
-    accuracy = acc_score(ys_te, y_pred)
-    distance_results_small.append([metric, accuracy])
+labels = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'matching', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']
+labels2 = ['correlation', 'cosine', 'dice', 'euclidean', 'jensenshannon', 'rogerstanimoto', 'sokalmichener', 'sokalsneath']
+for metric in tqdm(labels):
+    clf = KNN(x_train, y_train, 5)
+    now = time.time()
+    y_pred = clf.predict(x_test, metric)
+    time_barchart.append(time.time() - now)
+    accuracy = acc_score(y_test, y_pred)
+    accuracy_barchart.append(accuracy)
 
 #%%
-#Normalize data
-Xs_tr_norm = pd.DataFrame(MinMaxScaler().fit_transform(Xs_tr)) #immediately convert back to df
-Xs_te_norm = pd.DataFrame(MinMaxScaler().fit_transform(Xs_te))
+# Retreive 3 best scoring metrics based on accuracy
+indices = np.argpartition(accuracy_barchart, -3)[-3:]
+best_metrices = []
+for i in indices:
+    #best_metrices.append([labels[i], accuracy_barchart[i], time_barchart[i]])
+    print("Metric: {m}. Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], t=time_barchart[i]))
 
-#%%
-distance_results_small_scaled = []
+# Retreive values for euclidean
+i = labels.index('euclidean')
+print("For euclidean distance: Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], t=time_barchart[i]))
 
-for metric in tqdm(['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'matching', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']):
-    clf = KNN(Xs_tr_norm, ys_tr, 5)
-    y_pred = clf.predict(Xs_te_norm, metric)
-    accuracy = acc_score(ys_te, y_pred)
-    distance_results_small_scaled.append([metric, accuracy])
+#%% 
+# Normalize accuracy scores and training times for better comparison
+time_barchart_scaled = pd.DataFrame(MinMaxScaler().fit_transform(pd.DataFrame(time_barchart)))
+accuracy_barchart_scaled = pd.DataFrame(MinMaxScaler().fit_transform(pd.DataFrame(accuracy_barchart)))
 
-#%%
-# plot distance metric vs loss
-plt.bar(*zip(*distance_results_small), label='Unprocessed')
-plt.bar(*zip(*distance_results_small_scaled), label='Normalized')
-plt.xlabel("Metric")
-plt.xticks(rotation=90)
-plt.ylabel("Accuracy")
-plt.legend(loc='best')
-plt.show()
-# %%
+# Compute some kind of weighted score for accuracy and training time combined
+combined_score = []
+w = 2/3
+for i in range(len(labels)):
+    combined_score.append(w*accuracy_barchart_scaled[0][i] + (1-w)*(1-time_barchart_scaled[0][i]))
 
+# Retreive 3 best scoring metrics on the new score
+indices = np.argpartition(combined_score, -3)[-3:]
+best_metrices = []
+for i in indices:
+    #best_metrices.append([labels[i], accuracy_barchart[i], time_barchart[i]])
+    print("Metric: {m}. Combined score: {c}. Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], c=combined_score[i], t=time_barchart[i]))
 
+# Retreive values for euclidean
+i = labels.index('euclidean')
+print("For euclidean distance: Combined score: {c}. Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], c=combined_score[i], t=time_barchart[i]))
 
 
 # %%
@@ -73,6 +83,9 @@ x_train_tr = pd.DataFrame(pca.fit(x_train).transform(x_train))
 x_test_tr = pd.DataFrame(pca.transform(x_test))
 model_1 = KNN(x_train, y_train, 5)
 model_2 = KNN(x_train_tr, y_train, 5)
+
+def acc_score(y_test, y_pred):
+        return (y_test == y_pred).mean()
 
 #Speed comparison:
 now = time.time()
@@ -104,3 +117,63 @@ plt.ylabel("Accuracy")
 plt.xlabel("N components in PCA")
 plt.title('Comparing accuraccy scores of KNN using PCA with N components')
 # %%
+#%%
+########################### DISTANCES USING PCA ###############################
+accuracy_barchart = []
+time_barchart = []
+
+def acc_score(y_test, y_pred):
+        return (y_test == y_pred).mean()
+
+# minowski, weighted minowski and mahalanobis left out
+labels = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'matching', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']
+labels2 = ['euclidean', 'sqeuclidean', 'dice', 'matching']
+for metric in tqdm(labels):
+    pca = PCA(n_components=25)
+    x_train_tr = pd.DataFrame(pca.fit(x_train).transform(x_train))
+    x_test_tr = pd.DataFrame(pca.transform(x_test))
+    now = time.time()
+    accuracy = acc_score(KNN(x_train_tr, y_train, 5).predict(x_test_tr), y_test)
+    time_barchart.append(time.time() - now)
+    accuracy_barchart.append(accuracy)
+
+#%%
+# Retreive 3 best scoring metrics based on accuracy
+indices = np.argpartition(accuracy_barchart, -3)[-3:]
+best_metrices = []
+for i in indices:
+    #best_metrices.append([labels[i], accuracy_barchart[i], time_barchart[i]])
+    print("Metric: {m}. Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], t=time_barchart[i]))
+
+# Retreive values for euclidean
+i = labels.index('euclidean')
+print("For euclidean distance: Accuracy: {a}. Time: {t}".format(m=labels[i], a=accuracy_barchart[i], t=time_barchart[i]))
+#%% 
+# Normalize accuracy scores and training times for better comparison
+time_barchart_scaled = pd.DataFrame(MinMaxScaler().fit_transform(pd.DataFrame(time_barchart)))
+accuracy_barchart_scaled = pd.DataFrame(MinMaxScaler().fit_transform(pd.DataFrame(accuracy_barchart)))
+
+#%%
+# Compute some kind of weighted score for accuracy and training time combined
+combined_score = []
+w = 2/3
+for i in range(len(labels)):
+    combined_score.append(w*accuracy_barchart_scaled[0][i] + (1-w)*(1-time_barchart_scaled[0][i]))
+
+# Retreive 3 best scoring metrics on the new score
+indices = np.argpartition(combined_score, -3)[-3:]
+best_metrices = []
+for i in indices:
+    #best_metrices.append([labels[i], accuracy_barchart[i], time_barchart[i]])
+    print("Metric: {m}. Combined score: {c}. Accuracy: {a}. Time: {t}".format(m=labels[i], c=combined_score[i], a=accuracy_barchart[i], t=time_barchart[i]))
+
+# Retreive values for euclidean
+i = labels.index('euclidean')
+print("For euclidean distance: Metric: {m}. Combined score: {c}. Accuracy: {a}. Time: {t}".format(m=labels[i], c=combined_score[i], a=accuracy_barchart[i], t=time_barchart[i]))
+# %%
+clf = KNN(x_train, y_train, 5)
+now = time.time()
+y_pred = clf.predict(x_test, 'minkowski', )
+time_barchart.append(time.time() - now)
+accuracy = acc_score(y_test, y_pred)
+accuracy_barchart.append(accuracy)
