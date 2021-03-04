@@ -1,25 +1,31 @@
-
-# %%
 import pandas as pd
 import numpy as np
 from KNN import KNN
 from matplotlib import pyplot as plt
-from crossval import acc_score, leave_one_out
+from functools import partial
+from crossval import acc_score, leave_one_out, leave_one_out_legacy
+from tqdm.contrib.concurrent import process_map
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 import pickle
 
-p = 5 #TODO DEZE AANPASSEN
-metric = 'minkowski'
 
-# %%
+
+def loo_rewrite(k, x_train, y_train, metric='euclidean', p=None):
+    return leave_one_out_legacy(x_train, y_train, k, metric=metric, p=p)
+
+
 def main():
-
+    p = 7
+    metric = 'minkowski'
 
     train = pd.read_csv("input/MNIST_train.csv", header=None)
     y_train = train[0]
     x_train = train.drop(columns=0)
     print('Done loading')
+
+    # x_train = x_train[:500]
+    # y_train = y_train[:500]
 
     k_upper = 21
 
@@ -35,18 +41,20 @@ def main():
     print('Done preprocessing, starting estimations')
 
     #PREDICTING
-    preds = []
-    for k in range(1, k_upper):
-        print('scoring for k =' + str(k))
-        train_pred = leave_one_out(x_train, y_train, metric=metric, k=k, p=p)
-        preds.append({"train": train_pred})#, "test": test_pred})
+    # preds = []
+    # for k in range(1, k_upper):
+    #     print('scoring for k =' + str(k))
+    #     train_pred = leave_one_out(x_train, y_train, metric=metric, k=k, p=p)
+    #     preds.append({"train": train_pred})#, "test": test_pred})
+
+    scores = process_map(partial(loo_rewrite, x_train=x_train, y_train=y_train, metric=metric, p=p), range(1, k_upper), max_workers=10)
+    print(scores)
+
+    pickle.dump(scores, open("scores_e.pickle", "wb"))
+    pd.DataFrame(scores).to_csv('scores_e.csv')
 
 
-
-    pickle.dump(preds, open("preds_e.pickle", "wb"))
-
-
-    train_risk = [1-p.get('train') for p in preds]
+    train_risk = [1-score for score in scores]
 
 
     fig = plt.figure(figsize=(10,6))
@@ -62,4 +70,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-# %%
